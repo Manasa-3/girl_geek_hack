@@ -1,0 +1,45 @@
+import android.os.Bundle;
+import android.os.Handler;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+    private TextView messageTextView;
+    private Handler handler;
+    private static final int MESSAGE_DURATION = 5000; // Time in milliseconds (5 seconds in this example)
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        messageTextView = findViewById(R.id.messageTextView);
+        handler = new Handler();
+
+        // Example message, you can replace it with the actual message you want to display
+        showMessage("This message will disappear in 5 seconds");
+    }
+
+    private void showMessage(String message) {
+        messageTextView.setText(message);
+
+        // Set a timer to remove the message after MESSAGE_DURATION milliseconds
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                hideMessage();
+            }
+        }, MESSAGE_DURATION);
+    }
+
+    private void hideMessage() {
+        messageTextView.setText("");
+    }
+
+    @Override
+    protected void onDestroy() {
+        // Remove any remaining callbacks to prevent memory leaks
+        handler.removeCallbacksAndMessages(null);
+        super.onDestroy();
+    }
+}
