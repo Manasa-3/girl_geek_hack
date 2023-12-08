@@ -1,0 +1,48 @@
+import java.util.HashMap;
+import java.util.List;
+
+public class FakeMessageDetector {
+
+    private final List<String> fakeKeywords;
+    private final List<String> suspiciousUrls;
+
+    public FakeMessageDetector(List<String> fakeKeywords, List<String> suspiciousUrls) {
+        this.fakeKeywords = fakeKeywords;
+        this.suspiciousUrls = suspiciousUrls;
+    }
+
+    public boolean isFake(String message) {
+        // Extract features
+        HashMap<String, Integer> features = new HashMap<>();
+        for (String keyword : fakeKeywords) {
+            features.put(keyword, countOccurrences(keyword, message));
+        }
+        features.put("isUrl", containsSuspiciousUrl(message) ? 1 : 0);
+
+        // Example model using a simple threshold
+        int totalKeywords = 0;
+        for (String keyword : fakeKeywords) {
+            totalKeywords += features.get(keyword);
+        }
+        return totalKeywords > 2 || features.get("isUrl") == 1;
+    }
+
+    private int countOccurrences(String word, String message) {
+        int count = 0;
+        int index = message.indexOf(word);
+        while (index != -1) {
+            count++;
+            index = message.indexOf(word, index + 1);
+        }
+        return count;
+    }
+
+    private boolean containsSuspiciousUrl(String message) {
+        for (String url : suspiciousUrls) {
+            if (message.contains(url)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
